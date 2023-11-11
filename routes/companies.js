@@ -32,22 +32,15 @@ router.get('/:code', async (req, res, next) => {
     if (companies.rows.length === 0)
       throw new ExpressError("Company not found", 404);
 
-    let responseData =  {
-      company: {
+    let company = 
+      {
         code: companies.rows[0].code,
         name: companies.rows[0].name,
-        description: companies.rows[0].description
-      },
-      invoice: {
-        id: companies.rows[0].id,
-        amt: companies.rows[0].amt,
-        paid: companies.rows[0].paid,
-        add_date: companies.rows[0].add_date,
-        paid_date: companies.rows[0].paid_date
+        description: companies.rows[0].description,
+        invoices: companies.rows.map(({ id, amt, paid, add_date, paid_date }) => ({id, amt, paid, add_date, paid_date}))
       }
-    }
-
-    return res.json(responseData)
+    
+    return res.json(company)
   } catch (err) {
     return next(err);
   }

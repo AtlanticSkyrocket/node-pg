@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
 /** GET /invoices/:id: get an invoice by id */
 router.get('/:id', async (req, res, next) => {
   try {
-    const invoices = await db.query(`
+    const invoicesData = await db.query(`
       SELECT 
         invoices.id, invoices.amt, invoices.paid, 
         invoices.add_date, invoices.paid_date, 
@@ -29,24 +29,24 @@ router.get('/:id', async (req, res, next) => {
       WHERE invoices.id=$1`, 
       [req.params.id]);
 
-    if (invoices.rows.length === 0)
+    if (invoicesData.rows.length === 0)
      throw new ExpressError( "Invoice not found", 404);
 
-    let responseData =  {
+    let invoice =  {
       invoice: {
-        id: invoices.rows[0].id,
-        amt: invoices.rows[0].amt,
-        paid: invoices.rows[0].paid,
-        add_date: invoices.rows[0].add_date,
-        paid_date: invoices.rows[0].paid_date
+        id: invoicesData.rows[0].id,
+        amt: invoicesData.rows[0].amt,
+        paid: invoicesData.rows[0].paid,
+        add_date: invoicesData.rows[0].add_date,
+        paid_date: invoicesData.rows[0].paid_date
       },
       company: {
-        code: invoices.rows[0].code,
-        name: invoices.rows[0].name,
-        description: invoices.rows[0].description
+        code: invoicesData.rows[0].code,
+        name: invoicesData.rows[0].name,
+        description: invoicesData.rows[0].description
       }
     } 
-    return res.json(responseData)
+    return res.json(invoice)
   } catch (err) {
     return next(err);
   }
